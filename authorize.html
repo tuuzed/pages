@@ -1,0 +1,74 @@
+<html>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<head>
+    <title>OAuth2-Test</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
+        integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+</head>
+
+<body>
+    <div style="text-align: center;">
+        <h1>OAuth2</h1>
+        <br />
+        <br />
+        <button class="btn btn-primary" style="width: 160px;"
+            onclick="sendMessage(JSON.stringify({code:'123-123-123',state:'okay'}))">
+            同意
+        </button>
+        <br />
+        <br />
+        <button class="btn btn-danger" style="width: 160px;"
+            onclick="sendMessage(JSON.stringify({code:'456-456-456',state:'reject'}))">
+            拒绝
+        </button>
+    </div>
+
+</body>
+<script>
+    function sendMessage(message) {
+        const { isIOS, isIOS9 } = judgePhoneType();
+        try {
+            if (isIOS || isIOS9) {
+                window.webkit.messageHandlers.authorization.postMessage(message);
+            } else {
+                window.authorization.commonHandler(message);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+    //设备类型
+    function judgePhoneType() {
+        let isAndroid = false;
+        let isIOS = false;
+        let isIOS9 = false;
+        let version;
+        let u = navigator.userAgent;
+        let ua = u.toLowerCase();
+        //Android系统
+        if (u.indexOf("Android") > -1 || u.indexOf("Linux") > -1) {
+            //android终端或者uc浏览器
+            isAndroid = true;
+        }
+        //ios
+        if (ua.indexOf("like mac os x") > 0) {
+            let regStr_saf = /os [\d._]*/gi;
+            let verinfo = ua.match(regStr_saf);
+            version = (verinfo + "").replace(/[^0-9|_.]/gi, "").replace(/_/gi, ".");
+        }
+        let version_str = version + "";
+        // ios9以上
+        if (version_str !== "undefined" && version_str.length > 0) {
+            version = parseInt(version);
+            if (version >= 8) {
+                isIOS9 = true;
+            } else {
+                isIOS = true;
+            }
+        }
+        return { isAndroid, isIOS, isIOS9 };
+    }
+</script>
+
+</html>
